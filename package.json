@@ -1,0 +1,21 @@
+{
+  "name": "exclusive-resorts-qa-take-home",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Playwright UI automation for the Exclusive Resorts membership inquiry form",
+  "scripts": {
+    "test": "playwright test",
+    "test:smoke": "playwright test --grep @smoke",
+    "test:regression": "playwright test --grep @regression",
+    "test:negative": "playwright test --grep @negative",
+    "test:report": "playwright show-report"
+  },
+  "author": "Nataliia",
+  "license": "ISC",
+  "type": "commonjs",
+  "devDependencies": {
+    "@playwright/test": "^1.63.0",
+    "@types/node": "^26.6.2",
+    "typescript": "^7.0.2"
+  }
+}
