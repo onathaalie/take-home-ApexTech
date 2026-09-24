@@ -8,7 +8,9 @@
     "test:smoke": "playwright test --grep @smoke",
     "test:regression": "playwright test --grep @regression",
     "test:negative": "playwright test --grep @negative",
-    "test:report": "playwright show-report"
+    "test:report": "playwright show-report",
+    "test:api": "npx newman run postman/collection.json -e postman/environment.json",
+    "typecheck": "tsc --noEmit"
   },
   "author": "Nataliia",
   "license": "ISC",
@@ -16,6 +18,7 @@
   "devDependencies": {
     "@playwright/test": "^1.63.0",
     "@types/node": "^26.6.2",
+    "newman": "^6.2.2",
     "typescript": "^7.0.2"
   }
 }

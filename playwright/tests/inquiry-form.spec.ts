@@ -29,11 +29,12 @@ test.describe('Membership inquiry form', () => {
     await expect(inquiryPage.submitButton).toHaveAccessibleName('Submit');
     await expect(inquiryPage.countrySelector).toHaveAccessibleName('Country Code Selector');
 
-    // BUG-05: Last name is required but has no associated label.
+    // Imp-04: First name's accessible name is "Name*". Last name has no label, only the "Last" placeholder.
+    await expect(inquiryPage.firstName).toHaveAccessibleName('Name*');
     await expect(page.getByLabel('Last', { exact: true })).toHaveCount(0);
     await expect(inquiryPage.lastName).toHaveAttribute('placeholder', 'Last');
 
-    // BUG-06: Phone title is not the accessible name; the placeholder is.
+    // Phone's accessible name is the placeholder.
     await expect(inquiryPage.phone).toHaveAccessibleName('Enter a phone number');
     await expect(page.getByRole('textbox', { name: 'Phone*' })).toHaveCount(0);
   });
@@ -63,18 +64,12 @@ test.describe('Membership inquiry form', () => {
     expect(submission.values.preferredContactType).toBe('Email');
     expect(submission.values.termsAgreement).toBe('true');
     expect(submission.values.smsOptIn).toBe('');
-    expect(submission.values.smsOptIn).not.toBe('true');
 
-    const reachedSuccess = await page
-      .waitForURL('**/submission-success/**', { timeout: 8_000 })
-      .then(() => true)
-      .catch(() => false);
-
-    if (reachedSuccess) {
-      await expect(
-        page.getByText('Thank you for inquiring about Club Membership.'),
-      ).toBeVisible();
-    }
+    await expect(page.getByRole('heading', { name: 'We appreciate your interest.' })).toBeVisible();
+    await expect(
+      page.getByText('A Membership Director will connect with you shortly.'),
+    ).toBeVisible();
+    await expect(page).toHaveURL(/\/inquire\/?$/);
 
     expect(interceptedSubmissions).toHaveLength(1);
   });
@@ -140,17 +135,78 @@ test.describe('Membership inquiry form', () => {
     expect(interceptedSubmissions).toHaveLength(0);
   });
 
-  test('TC-13 — double-click does not create duplicate submissions @regression', async ({
+  test('TC-11 — form is completable by keyboard @regression', async ({
     inquiryPage,
     interceptedSubmissions,
+    page,
   }) => {
-    await inquiryPage.fillRequiredFields(validInquiryData);
-    await inquiryPage.setConsent(true);
-
-    await inquiryPage.doubleClickSubmit();
+    await inquiryPage.fillRequiredFieldsWithKeyboard(validInquiryData);
+    await inquiryPage.submitWithEnter();
 
     await expect.poll(() => interceptedSubmissions.length).toBe(1);
+    expect(interceptedSubmissions[0].url).toContain('/submit-form/');
+    expect(interceptedSubmissions[0].method).toBe('POST');
+    expect(interceptedSubmissions[0].values.FirstName).toBe(validInquiryData.firstName);
+    expect(interceptedSubmissions[0].values.LastName).toBe(validInquiryData.lastName);
     expect(interceptedSubmissions[0].values.Email).toBe(validInquiryData.email);
+    expect(interceptedSubmissions[0].values.preferredContactType).toBe('Email');
     expect(interceptedSubmissions[0].values.termsAgreement).toBe('true');
+    expect(interceptedSubmissions[0].values.smsOptIn).not.toBe('true');
+
+    await expect(page.getByRole('heading', { name: 'We appreciate your interest.' })).toBeVisible();
+    await expect(page).toHaveURL(/\/inquire\/?$/);
+    expect(interceptedSubmissions).toHaveLength(1);
+  });
+
+  test.describe('375px viewport', () => {
+    test.use({ viewport: { width: 375, height: 812 } });
+
+    test('TC-12 — form is completable at 375px @regression', async ({
+      inquiryPage,
+      interceptedSubmissions,
+      page,
+    }) => {
+      expect(page.viewportSize()).toEqual({ width: 375, height: 812 });
+      await inquiryPage.assertFitsViewport();
+
+      await inquiryPage.fillRequiredFields(validInquiryData);
+      await inquiryPage.setConsent(true);
+      await expect(inquiryPage.smsCheckbox).not.toBeChecked();
+      await inquiryPage.submit();
+
+      await expect.poll(() => interceptedSubmissions.length).toBe(1);
+      expect(interceptedSubmissions[0].url).toContain('/submit-form/');
+      expect(interceptedSubmissions[0].method).toBe('POST');
+      expect(interceptedSubmissions[0].values.Email).toBe(validInquiryData.email);
+      expect(interceptedSubmissions[0].values.termsAgreement).toBe('true');
+      expect(interceptedSubmissions[0].values.smsOptIn).not.toBe('true');
+
+      await expect(page.getByRole('heading', { name: 'We appreciate your interest.' })).toBeVisible();
+      await expect(page).toHaveURL(/\/inquire\/?$/);
+      expect(interceptedSubmissions).toHaveLength(1);
+    });
+  });
+
+  test.describe('submit response still in flight', () => {
+    // An instant stub closes before the second click of dblclick() can race it.
+    // Hold the response so a duplicate POST has a real pending window.
+    test.use({ submitResponseDelayMs: 800 });
+
+    test('TC-13 — double-click does not create duplicate submissions @regression', async ({
+      inquiryPage,
+      interceptedSubmissions,
+      page,
+    }) => {
+      await inquiryPage.fillRequiredFields(validInquiryData);
+      await inquiryPage.setConsent(true);
+
+      await inquiryPage.doubleClickSubmit();
+
+      await expect(page.getByRole('heading', { name: 'We appreciate your interest.' })).toBeVisible();
+
+      expect(interceptedSubmissions).toHaveLength(1);
+      expect(interceptedSubmissions[0].values.Email).toBe(validInquiryData.email);
+      expect(interceptedSubmissions[0].values.termsAgreement).toBe('true');
+    });
   });
 });

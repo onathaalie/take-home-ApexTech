@@ -1,0 +1,100 @@
+{
+	"id": "a19a124d-cd8b-48cb-84c1-e7e37538ab6b",
+	"name": "Membership Inquiry - Environment",
+	"values": [
+		{
+			"key": "baseUrl",
+			"value": "https://public-site.stage.exclusiveresorts.com",
+			"type": "default",
+			"enabled": true
+		},
+		{
+			"key": "submitPath",
+			"value": "/submit-form/",
+			"type": "default",
+			"enabled": true
+		},
+		{
+			"key": "testEmail",
+			"value": "qa.candidate+test@gmail.com",
+			"type": "default",
+			"enabled": true
+		},
+		{
+			"key": "testPhone",
+			"value": "+1 303 555 0100",
+			"type": "default",
+			"enabled": true
+		},
+		{
+			"key": "firstName",
+			"value": "QA Candidate",
+			"type": "default",
+			"enabled": true
+		},
+		{
+			"key": "lastName",
+			"value": "Nataliia",
+			"type": "default",
+			"enabled": true
+		},
+		{
+			"key": "zip",
+			"value": "80302",
+			"type": "default",
+			"enabled": true
+		},
+		{
+			"key": "termsAgreement",
+			"value": "true",
+			"type": "default",
+			"enabled": true
+		},
+		{
+			"key": "fbId",
+			"value": "00000000-0000-0000-0000-000000000001",
+			"type": "default",
+			"enabled": true
+		},
+		{
+			"key": "preferredTime",
+			"value": "Afternoon",
+			"type": "default",
+			"enabled": true
+		},
+		{
+			"key": "preferredDays",
+			"value": "Monday-Friday",
+			"type": "default",
+			"enabled": true
+		},
+		{
+			"key": "preferredContactType",
+			"value": "Phone",
+			"type": "default",
+			"enabled": true
+		},
+		{
+			"key": "invalidEmail",
+			"value": "invalid-email",
+			"type": "default",
+			"enabled": true
+		},
+		{
+			"key": "termsAgreementFalse",
+			"value": "false",
+			"type": "default",
+			"enabled": true
+		},
+		{
+			"key": "sqlInjectionName",
+			"value": "' OR '1'='1",
+			"type": "default",
+			"enabled": true
+		}
+	],
+	"color": 240,
+	"_postman_variable_scope": "environment",
+	"_postman_exported_at": "2026-09-24T19:30:22.567Z",
+	"_postman_exported_using": "Postman/12.29.3"
+}

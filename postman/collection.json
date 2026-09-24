@@ -1,0 +1,474 @@
+{
+  "info": {
+    "_postman_id": "01814150-7cb5-44c2-9192-d80d3979aa08",
+    "name": "Membership Inquiry API Tests",
+    "description": "This collection tests the **backend API** used by the Exclusive Resorts Membership Inquiry form.\n\nIt covers positive, negative, security, HTTP method, performance, and response schema scenarios.\n\n**Test coverage:**\n\n- Valid membership inquiry submission\n    \n- Missing required field\n    \n- Invalid email format\n    \n- Consent validation\n    \n- SQL injection-style input handling\n    \n- Unsupported HTTP method\n    \n- Response time and performance\n    \n- Response schema validation\n    \n\nThe collection is parameterized using Postman environment variables. The target environment can be switched by updating the `baseUrl` variable.\n\n[Learn more about Postman Collections.](https://learning.postman.com/docs/collections/collections-overview/)",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "58384828",
+    "_collection_link": "https://go.postman.co/collection/58384828-01814150-7cb5-44c2-9192-d80d3979aa08?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "API-01 - Valid submission",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Response status is 2xx\", function () {\n    pm.expect(pm.response.code).to.be.within(200, 299);\n});\n\npm.test(\"Response time is less than 2000 ms\", function () {\n    pm.expect(pm.response.responseTime).to.be.below(2000);\n});\n\npm.test(\"Response is valid JSON\", function () {\n    pm.response.to.be.json;\n});\n\npm.test(\"Response contains data object\", function () {\n    const json = pm.response.json();\n\n    pm.expect(json).to.have.property(\"data\");\n    pm.expect(json.data).to.be.an(\"object\");\n});\n\npm.test(\"Response contains submission ID\", function () {\n    const json = pm.response.json();\n\n    pm.expect(json.data).to.have.property(\"id\");\n    pm.expect(json.data.id).to.be.a(\"number\");\n});"
+            ]
+          }
+        }
+      ],
+      "protocolProfileBehavior": {
+        "disabledSystemHeaders": {
+          "content-type": true,
+          "user-agent": true
+        }
+      },
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-type",
+            "value": "application/x-www-form-urlencoded"
+          },
+          {
+            "key": "Origin",
+            "value": "https://public-site.stage.exclusiveresorts.com"
+          },
+          {
+            "key": "Referer",
+            "value": "https://public-site.stage.exclusiveresorts.com/inquire/"
+          },
+          {
+            "key": "User-Agent",
+            "value": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"values\": \"Email={{testEmail}}&Phone={{testPhone}}&FirstName={{firstName}}&LastName={{lastName}}&ZIP={{zip}}&termsAgreement={{termsAgreement}}&FBID={{fbId}}&GCLID=&msclkid=&C_SFDCLastCampaignID=&C_Page_URL={{baseUrl}}/inquire/&smsOptIn=&preferredTime={{preferredTime}}&preferredDays={{preferredDays}}&preferredContactType={{preferredContactType}}&Braze_Campaign_ID=&Referrer_URL={{baseUrl}}/inquire/\",\r\n  \"form\": \"SHORT_FORM\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}{{submitPath}}",
+          "host": [
+            "{{baseUrl}}{{submitPath}}"
+          ]
+        },
+        "description": "This is a POST request, submitting data to an API via the request body. This request submits JSON data, and the data is reflected in the response.\n\nA successful POST request typically returns a `200 OK` or `201 Created` response code."
+      },
+      "response": []
+    },
+    {
+      "name": "API-02 - Missing required field",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Response status is 4xx\", function () {\n    pm.expect(pm.response.code).to.be.within(400, 499);\n});\n\npm.test(\"Response time is less than 2000 ms\", function () {\n    pm.expect(pm.response.responseTime).to.be.below(2000);\n});\n\npm.test(\"Response is valid JSON\", function () {\n    pm.response.to.be.json;\n});"
+            ]
+          }
+        }
+      ],
+      "protocolProfileBehavior": {
+        "disabledSystemHeaders": {
+          "content-type": true,
+          "user-agent": true
+        }
+      },
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-type",
+            "value": "application/x-www-form-urlencoded"
+          },
+          {
+            "key": "Origin",
+            "value": "https://public-site.stage.exclusiveresorts.com"
+          },
+          {
+            "key": "Referer",
+            "value": "https://public-site.stage.exclusiveresorts.com/inquire/"
+          },
+          {
+            "key": "User-Agent",
+            "value": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"values\": \"Phone={{testPhone}}&FirstName={{firstName}}&LastName={{lastName}}&ZIP={{zip}}&termsAgreement={{termsAgreement}}&FBID={{fbId}}&GCLID=&msclkid=&C_SFDCLastCampaignID=&C_Page_URL={{baseUrl}}/inquire/&smsOptIn=&preferredTime={{preferredTime}}&preferredDays={{preferredDays}}&preferredContactType={{preferredContactType}}&Braze_Campaign_ID=&Referrer_URL={{baseUrl}}/inquire/\",\r\n  \"form\": \"SHORT_FORM\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}{{submitPath}}",
+          "host": [
+            "{{baseUrl}}{{submitPath}}"
+          ]
+        },
+        "description": "This is a POST request, submitting data to an API via the request body. This request submits JSON data, and the data is reflected in the response.\n\nA successful POST request typically returns a `200 OK` or `201 Created` response code."
+      },
+      "response": []
+    },
+    {
+      "name": "API-03 - Malformed email",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Response status is 4xx\", function () {\n    pm.expect(pm.response.code).to.be.within(400, 499);\n});\n\npm.test(\"Response time is less than 2000 ms\", function () {\n    pm.expect(pm.response.responseTime).to.be.below(2000);\n});\n\npm.test(\"Response is valid JSON\", function () {\n    pm.response.to.be.json;\n});"
+            ]
+          }
+        }
+      ],
+      "protocolProfileBehavior": {
+        "disabledSystemHeaders": {
+          "content-type": true,
+          "user-agent": true
+        }
+      },
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-type",
+            "value": "application/x-www-form-urlencoded"
+          },
+          {
+            "key": "Origin",
+            "value": "https://public-site.stage.exclusiveresorts.com"
+          },
+          {
+            "key": "Referer",
+            "value": "https://public-site.stage.exclusiveresorts.com/inquire/"
+          },
+          {
+            "key": "User-Agent",
+            "value": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"values\": \"Email={{invalidEmail}}&Phone={{testPhone}}&FirstName={{firstName}}&LastName={{lastName}}&ZIP={{zip}}&termsAgreement={{termsAgreement}}&FBID={{fbId}}&GCLID=&msclkid=&C_SFDCLastCampaignID=&C_Page_URL={{baseUrl}}/inquire/&smsOptIn=&preferredTime={{preferredTime}}&preferredDays={{preferredDays}}&preferredContactType={{preferredContactType}}&Braze_Campaign_ID=&Referrer_URL={{baseUrl}}/inquire/\",\r\n  \"form\": \"SHORT_FORM\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}{{submitPath}}",
+          "host": [
+            "{{baseUrl}}{{submitPath}}"
+          ]
+        },
+        "description": "This is a POST request, submitting data to an API via the request body. This request submits JSON data, and the data is reflected in the response.\n\nA successful POST request typically returns a `200 OK` or `201 Created` response code."
+      },
+      "response": []
+    },
+    {
+      "name": "API-04 - Missing consent",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Response status is 4xx\", function () {\n    pm.expect(pm.response.code).to.be.within(400, 499);\n});\n\npm.test(\"Response time is less than 2000 ms\", function () {\n    pm.expect(pm.response.responseTime).to.be.below(2000);\n});\n\npm.test(\"Response is valid JSON\", function () {\n    pm.response.to.be.json;\n});"
+            ]
+          }
+        }
+      ],
+      "protocolProfileBehavior": {
+        "disabledSystemHeaders": {
+          "content-type": true,
+          "user-agent": true
+        }
+      },
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-type",
+            "value": "application/x-www-form-urlencoded"
+          },
+          {
+            "key": "Origin",
+            "value": "https://public-site.stage.exclusiveresorts.com"
+          },
+          {
+            "key": "Referer",
+            "value": "https://public-site.stage.exclusiveresorts.com/inquire/"
+          },
+          {
+            "key": "User-Agent",
+            "value": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"values\": \"Email={{testEmail}}&Phone={{testPhone}}&FirstName={{firstName}}&LastName={{lastName}}&ZIP={{zip}}&termsAgreement={{termsAgreementFalse}}&FBID={{fbId}}&GCLID=&msclkid=&C_SFDCLastCampaignID=&C_Page_URL={{baseUrl}}/inquire/&smsOptIn=&preferredTime={{preferredTime}}&preferredDays={{preferredDays}}&preferredContactType={{preferredContactType}}&Braze_Campaign_ID=&Referrer_URL={{baseUrl}}/inquire/\",\r\n  \"form\": \"SHORT_FORM\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}{{submitPath}}",
+          "host": [
+            "{{baseUrl}}{{submitPath}}"
+          ]
+        },
+        "description": "This is a POST request, submitting data to an API via the request body. This request submits JSON data, and the data is reflected in the response.\n\nA successful POST request typically returns a `200 OK` or `201 Created` response code."
+      },
+      "response": []
+    },
+    {
+      "name": "API-05 - SQL injection payload",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Response status is successful\", function () {\n    pm.expect(pm.response.code).to.be.within(200, 299);\n});\n\npm.test(\"Response time is less than 2000 ms\", function () {\n    pm.expect(pm.response.responseTime).to.be.below(2000);\n});\n\npm.test(\"Response is valid JSON\", function () {\n    pm.response.to.be.json;\n});\n\npm.test(\"Response contains submission ID\", function () {\n    const json = pm.response.json();\n\n    pm.expect(json).to.have.property(\"data\");\n    pm.expect(json.data).to.have.property(\"id\");\n    pm.expect(json.data.id).to.be.a(\"number\");\n});\n\npm.test(\"Response does not expose database errors\", function () {\n    const responseText = pm.response.text().toLowerCase();\n\n    pm.expect(responseText).to.not.include(\"sql\");\n    pm.expect(responseText).to.not.include(\"syntax error\");\n    pm.expect(responseText).to.not.include(\"database\");\n    pm.expect(responseText).to.not.include(\"mysql\");\n    pm.expect(responseText).to.not.include(\"postgres\");\n    pm.expect(responseText).to.not.include(\"oracle\");\n    pm.expect(responseText).to.not.include(\"exception\");\n    pm.expect(responseText).to.not.include(\"stack trace\");\n});"
+            ]
+          }
+        }
+      ],
+      "protocolProfileBehavior": {
+        "disabledSystemHeaders": {
+          "content-type": true,
+          "user-agent": true
+        }
+      },
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-type",
+            "value": "application/x-www-form-urlencoded"
+          },
+          {
+            "key": "Origin",
+            "value": "https://public-site.stage.exclusiveresorts.com"
+          },
+          {
+            "key": "Referer",
+            "value": "https://public-site.stage.exclusiveresorts.com/inquire/"
+          },
+          {
+            "key": "User-Agent",
+            "value": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"values\": \"Email={{testEmail}}&Phone={{testPhone}}&FirstName={{sqlInjectionName}}&LastName={{lastName}}&ZIP={{zip}}&termsAgreement={{termsAgreement}}&FBID={{fbId}}&GCLID=&msclkid=&C_SFDCLastCampaignID=&C_Page_URL={{baseUrl}}/inquire/&smsOptIn=&preferredTime={{preferredTime}}&preferredDays={{preferredDays}}&preferredContactType={{preferredContactType}}&Braze_Campaign_ID=&Referrer_URL={{baseUrl}}/inquire/\",\r\n  \"form\": \"SHORT_FORM\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}{{submitPath}}",
+          "host": [
+            "{{baseUrl}}{{submitPath}}"
+          ]
+        },
+        "description": "This is a POST request, submitting data to an API via the request body. This request submits JSON data, and the data is reflected in the response.\n\nA successful POST request typically returns a `200 OK` or `201 Created` response code."
+      },
+      "response": []
+    },
+    {
+      "name": "API-06 - GET on the submit endpoint",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Response status is 405 Method Not Allowed\", function () {\n    pm.expect(pm.response.code).to.eql(405);\n});\n\npm.test(\"Response time is less than 2000 ms\", function () {\n    pm.expect(pm.response.responseTime).to.be.below(2000);\n});"
+            ]
+          }
+        }
+      ],
+      "protocolProfileBehavior": {
+        "disabledSystemHeaders": {
+          "content-type": true,
+          "user-agent": true
+        }
+      },
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-type",
+            "value": "application/x-www-form-urlencoded",
+            "disabled": true
+          },
+          {
+            "key": "Origin",
+            "value": "https://public-site.stage.exclusiveresorts.com"
+          },
+          {
+            "key": "Referer",
+            "value": "https://public-site.stage.exclusiveresorts.com/inquire/"
+          },
+          {
+            "key": "User-Agent",
+            "value": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}{{submitPath}}",
+          "host": [
+            "{{baseUrl}}{{submitPath}}"
+          ]
+        },
+        "description": "This is a POST request, submitting data to an API via the request body. This request submits JSON data, and the data is reflected in the response.\n\nA successful POST request typically returns a `200 OK` or `201 Created` response code."
+      },
+      "response": []
+    },
+    {
+      "name": "API-07 - Response time p95",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "// Store response time for this iteration\nconst responseTimes =\n    JSON.parse(pm.collectionVariables.get(\"api07_responseTimes\") || \"[]\");\n\nresponseTimes.push(pm.response.responseTime);\n\npm.collectionVariables.set(\n    \"api07_responseTimes\",\n    JSON.stringify(responseTimes)\n);\n\n// Every individual request must be below 2000 ms\npm.test(\"Response time is less than 2000 ms\", function () {\n    pm.expect(pm.response.responseTime).to.be.below(2000);\n});\n\n// After the 10th request, calculate p95\nif (pm.info.iteration === 9) {\n    const times = responseTimes.slice().sort((a, b) => a - b);\n\n    const p95Index = Math.ceil(times.length * 0.95) - 1;\n    const p95 = times[p95Index];\n\n    console.log(\"API-07 response times:\", times);\n    console.log(\"API-07 p95 response time:\", p95 + \" ms\");\n\n    pm.test(\"p95 response time is less than 2000 ms\", function () {\n        pm.expect(p95).to.be.below(2000);\n    });\n}"
+            ]
+          }
+        }
+      ],
+      "protocolProfileBehavior": {
+        "disabledSystemHeaders": {
+          "content-type": true,
+          "user-agent": true
+        }
+      },
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-type",
+            "value": "application/x-www-form-urlencoded"
+          },
+          {
+            "key": "Origin",
+            "value": "https://public-site.stage.exclusiveresorts.com"
+          },
+          {
+            "key": "Referer",
+            "value": "https://public-site.stage.exclusiveresorts.com/inquire/"
+          },
+          {
+            "key": "User-Agent",
+            "value": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"values\": \"Email={{testEmail}}&Phone={{testPhone}}&FirstName={{firstName}}&LastName={{lastName}}&ZIP={{zip}}&termsAgreement={{termsAgreement}}&FBID={{fbId}}&GCLID=&msclkid=&C_SFDCLastCampaignID=&C_Page_URL={{baseUrl}}/inquire/&smsOptIn=&preferredTime={{preferredTime}}&preferredDays={{preferredDays}}&preferredContactType={{preferredContactType}}&Braze_Campaign_ID=&Referrer_URL={{baseUrl}}/inquire/\",\r\n  \"form\": \"SHORT_FORM\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}{{submitPath}}",
+          "host": [
+            "{{baseUrl}}{{submitPath}}"
+          ]
+        },
+        "description": "This is a POST request, submitting data to an API via the request body. This request submits JSON data, and the data is reflected in the response.\n\nA successful POST request typically returns a `200 OK` or `201 Created` response code."
+      },
+      "response": []
+    },
+    {
+      "name": "API-08 - Response shape matches contract",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Response status is 2xx\", function () {\n    pm.expect(pm.response.code).to.be.within(200, 299);\n});\n\npm.test(\"Response is valid JSON\", function () {\n    pm.response.to.be.json;\n});\n\npm.test(\"Response contains data object\", function () {\n    const json = pm.response.json();\n\n    pm.expect(json).to.have.property(\"data\");\n    pm.expect(json.data).to.be.an(\"object\");\n});\n\npm.test(\"data contains required id\", function () {\n    const json = pm.response.json();\n\n    pm.expect(json.data).to.have.property(\"id\");\n});\n\npm.test(\"id is a number\", function () {\n    const json = pm.response.json();\n\n    pm.expect(json.data.id).to.be.a(\"number\");\n});\n\npm.test(\"id is a positive integer\", function () {\n    const json = pm.response.json();\n\n    pm.expect(json.data.id).to.be.a(\"number\");\n    pm.expect(Number.isInteger(json.data.id)).to.be.true;\n    pm.expect(json.data.id).to.be.above(0);\n});"
+            ]
+          }
+        }
+      ],
+      "protocolProfileBehavior": {
+        "disabledSystemHeaders": {
+          "content-type": true,
+          "user-agent": true
+        }
+      },
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-type",
+            "value": "application/x-www-form-urlencoded"
+          },
+          {
+            "key": "Origin",
+            "value": "https://public-site.stage.exclusiveresorts.com"
+          },
+          {
+            "key": "Referer",
+            "value": "https://public-site.stage.exclusiveresorts.com/inquire/"
+          },
+          {
+            "key": "User-Agent",
+            "value": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"values\": \"Email={{testEmail}}&Phone={{testPhone}}&FirstName={{firstName}}&LastName={{lastName}}&ZIP={{zip}}&termsAgreement={{termsAgreement}}&FBID={{fbId}}&GCLID=&msclkid=&C_SFDCLastCampaignID=&C_Page_URL={{baseUrl}}/inquire/&smsOptIn=&preferredTime={{preferredTime}}&preferredDays={{preferredDays}}&preferredContactType={{preferredContactType}}&Braze_Campaign_ID=&Referrer_URL={{baseUrl}}/inquire/\",\r\n  \"form\": \"SHORT_FORM\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}{{submitPath}}",
+          "host": [
+            "{{baseUrl}}{{submitPath}}"
+          ]
+        },
+        "description": "This is a POST request, submitting data to an API via the request body. This request submits JSON data, and the data is reflected in the response.\n\nA successful POST request typically returns a `200 OK` or `201 Created` response code."
+      },
+      "response": []
+    }
+  ],
+  "variable": [
+    {
+      "key": "api07_responseTimes",
+      "value": ""
+    }
+  ]
+}

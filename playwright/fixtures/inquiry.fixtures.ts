@@ -29,8 +29,11 @@ function parseSubmitPayload(postData: string): { form: string; values: Record<st
 export const test = base.extend<{
   interceptedSubmissions: CapturedSubmit[];
   inquiryPage: InquiryPage;
+  submitResponseDelayMs: number;
 }>({
-  interceptedSubmissions: async ({ page }, use) => {
+  submitResponseDelayMs: [0, { option: true }],
+
+  interceptedSubmissions: async ({ page, submitResponseDelayMs }, use) => {
     const captured: CapturedSubmit[] = [];
 
     await page.route(/\/submit-form\/?(\?.*)?$/, async (route) => {
@@ -45,6 +48,10 @@ export const test = base.extend<{
           form: parsed.form,
           values: parsed.values,
         });
+      }
+
+      if (submitResponseDelayMs > 0) {
+        await new Promise((resolve) => setTimeout(resolve, submitResponseDelayMs));
       }
 
       await route.fulfill({

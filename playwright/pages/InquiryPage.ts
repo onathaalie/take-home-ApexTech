@@ -183,4 +183,89 @@ export class InquiryPage {
   async doubleClickSubmit(): Promise<void> {
     await this.submitButton.dblclick();
   }
+
+  async tabTo(locator: Locator, maxTabs = 20): Promise<void> {
+    for (let i = 0; i < maxTabs; i++) {
+      if (await locator.evaluate((el) => el === document.activeElement)) {
+        return;
+      }
+      await this.page.keyboard.press('Tab');
+    }
+    await expect(locator).toBeFocused();
+  }
+
+  async fillRequiredFieldsWithKeyboard(data: {
+    firstName: string;
+    lastName: string;
+    email: string;
+    postalCode: string;
+    phone: string;
+  }): Promise<void> {
+    await this.firstName.focus();
+    await this.page.keyboard.type(data.firstName);
+    await this.tabTo(this.lastName);
+    await this.page.keyboard.type(data.lastName);
+    await this.tabTo(this.email);
+    await this.page.keyboard.type(data.email);
+    await this.tabTo(this.postalCode);
+    await this.page.keyboard.type(data.postalCode);
+    await this.tabTo(this.phone);
+    await this.page.keyboard.type(data.phone);
+
+    await this.tabTo(this.preferredContactRadio('Phone'));
+    await this.page.keyboard.press('ArrowDown');
+    await this.page.keyboard.press('ArrowDown');
+    await expect(this.preferredContactRadio('Email')).toBeChecked();
+
+    await this.tabTo(this.consentCheckbox);
+    await this.page.keyboard.press('Space');
+    await expect(this.consentCheckbox).toBeChecked();
+
+    await this.tabTo(this.smsCheckbox);
+    await this.page.keyboard.press('Space');
+    await expect(this.smsCheckbox).toBeChecked();
+    await this.page.keyboard.press('Space');
+    await expect(this.smsCheckbox).not.toBeChecked();
+
+    await expect(this.firstName).toHaveValue(data.firstName);
+    await expect(this.lastName).toHaveValue(data.lastName);
+    await expect(this.email).toHaveValue(data.email);
+    await expect(this.postalCode).toHaveValue(data.postalCode);
+    await expect(this.phone).toHaveValue(/303/);
+  }
+
+  async submitWithEnter(): Promise<void> {
+    await this.tabTo(this.submitButton);
+    await this.page.keyboard.press('Enter');
+  }
+
+  async assertFitsViewport(): Promise<void> {
+    const viewport = this.page.viewportSize();
+    if (!viewport) {
+      throw new Error('Viewport size is not set');
+    }
+
+    const controls = [
+      this.firstName,
+      this.lastName,
+      this.email,
+      this.postalCode,
+      this.phone,
+      this.submitButton,
+    ];
+
+    for (const control of controls) {
+      await control.scrollIntoViewIfNeeded();
+      await expect(control).toBeVisible();
+      const box = await control.boundingBox();
+      expect(box).not.toBeNull();
+      expect(box!.x).toBeGreaterThanOrEqual(0);
+      expect(box!.x + box!.width).toBeLessThanOrEqual(viewport.width + 1);
+    }
+
+    const overflow = await this.page.evaluate(
+      () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+    );
+    expect(overflow).toBeLessThanOrEqual(1);
+  }
 }
